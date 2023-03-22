@@ -6,6 +6,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class SceneLoader : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class SceneLoader : MonoBehaviour
 
     [SerializeField] private LoadEventChannelSO _coldStartupEvent;
     [SerializeField] private GameSceneSO _gameplayManagerSceneSO;
+    [SerializeField] private Text progressText;
+    public GameObject canvas;
 
     private GameSceneSO _sceneToLoad;
     private GameSceneSO _currentLoadedScene;
@@ -31,6 +34,7 @@ public class SceneLoader : MonoBehaviour
 
     private void OnEnable()
     {
+        canvas.SetActive(true);
         _loadMainScene.OnLoadSceneRequested += LoadTitleScene;
 #if UNITY_EDITOR
         _coldStartupEvent.OnLoadSceneRequested += OnLoadSceneRequested;
@@ -60,7 +64,8 @@ public class SceneLoader : MonoBehaviour
                 _gameplayManagerLoadingOpHandle.WaitForCompletion();
                 _gameplayManagersSceneInstance = _gameplayManagerLoadingOpHandle.Result;
 
-                StartGameplay(1);
+
+                StartGameplay();
                 return;
             // title, select stage, UI that doesn't need gameplay managers
             case GameSceneSO.SceneType.Title:
@@ -149,10 +154,23 @@ public class SceneLoader : MonoBehaviour
         // Because scene.OperationHandle is invalid
         _sceneToLoad.handle = _loadingOperationHandle;
         _loadingOperationHandle.Completed += OnNewSceneLoaded;
+        StartCoroutine(updateProgressText());
+    }
+
+    private IEnumerator updateProgressText()
+    {
+        while (!_loadingOperationHandle.IsDone)
+        {
+            var percent = (int)(_loadingOperationHandle.GetDownloadStatus().Percent * 100);
+            progressText.text = $"{percent}%";
+            Debug.Log($"SceneLoader::LoadSceneAsync::Loading scene [{percent}]");
+            yield return _loadingOperationHandle.PercentComplete;
+        }
     }
 
     private void OnNewSceneLoaded(AsyncOperationHandle<SceneInstance> obj)
     {
+        progressText.text = "100%";
         //Save loaded scenes (to be unloaded at next load request)
         _sceneManager.lastScene = _currentLoadedScene;
         _sceneManager.currentScene = _sceneToLoad;
@@ -165,15 +183,9 @@ public class SceneLoader : MonoBehaviour
         StartGameplay();
     }
 
-    private void StartGameplay(float delay = 0f)
+    private void StartGameplay()
     {
-        StartCoroutine(RaiseEventAfterDelay(delay));
-    }
-
-    private IEnumerator RaiseEventAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        // Only playable scene should broadcast this event
         _onSceneReadyChannel.RaiseEvent();
+        canvas.SetActive(false);
     }
 }
