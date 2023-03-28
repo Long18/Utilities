@@ -33,6 +33,7 @@ public class LoadingUI : MonoBehaviour
 
     private void OnProgressChanged(float progress)
     {
-        progressText.text = $"{progress}%";
+        var progressInt = (int) (progress * 100);
+        progressText.text = $"{progressInt}%";
     }
 }

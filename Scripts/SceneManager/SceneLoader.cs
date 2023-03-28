@@ -163,7 +163,7 @@ public class SceneLoader : MonoBehaviour
     {
         while (!_loadingOperationHandle.IsDone)
         {
-            var percent = ((int)_loadingOperationHandle.GetDownloadStatus().Percent * 100);
+            var percent = _loadingOperationHandle.GetDownloadStatus().Percent;
             onProgressChanged.RaiseEvent(percent);
 #if UNITY_EDITOR
             Debug.Log($"SceneLoader::LoadSceneAsync::Loading scene [{percent}]");
