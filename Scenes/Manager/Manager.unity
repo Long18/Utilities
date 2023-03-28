@@ -132,10 +132,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 532737685}
-  - component: {fileID: 532737687}
   - component: {fileID: 532737686}
   m_Layer: 5
-  m_Name: Image
+  m_Name: LoadingUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -171,35 +170,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 532737684}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: e4525dc3f6ce75949af5f9f9c50219bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &532737687
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 532737684}
-  m_CullTransparentMesh: 1
+  onShowLoadingUI: {fileID: 11400000, guid: b08f65b5d10872047894e921712f2d3f, type: 2}
+  onProgressChanged: {fileID: 11400000, guid: 197aeac219be8e843ad5dc14263d638e, type: 2}
+  progressText: {fileID: 1941949196}
+  gui: {fileID: 2001309504}
 --- !u!1 &910857410
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,7 +229,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.95437217, g: 1, b: 0, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
@@ -367,7 +344,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1504264454
 RectTransform:
@@ -643,14 +620,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3996891121834728122, guid: a08afeaa92a4ba14a974155451fb6310, type: 3}
-      propertyPath: canvas
-      value: 
-      objectReference: {fileID: 1504264450}
-    - target: {fileID: 3996891121834728122, guid: a08afeaa92a4ba14a974155451fb6310, type: 3}
-      propertyPath: progressText
-      value: 
-      objectReference: {fileID: 1941949196}
     - target: {fileID: 3996891121834728123, guid: a08afeaa92a4ba14a974155451fb6310, type: 3}
       propertyPath: m_Name
       value: SceneLoader

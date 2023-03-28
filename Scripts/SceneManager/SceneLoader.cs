@@ -11,7 +11,6 @@ using UnityEngine.UI;
 public class SceneLoader : MonoBehaviour
 {
     [SerializeField] private SceneManagerSO _sceneManager;
-
     [SerializeField] private VoidEventChannel _onSceneReadyChannel;
 
     [FormerlySerializedAs("_loadTitleEvent")]
@@ -20,10 +19,14 @@ public class SceneLoader : MonoBehaviour
     [SerializeField]
     private LoadEventChannelSO _loadMainScene;
 
+    [Header("Raise Event")] [SerializeField]
+    private BoolEventChannel onShowLoadingUI;
+
+    [SerializeField] private FloatEventChannel onProgressChanged;
+
+
     [SerializeField] private LoadEventChannelSO _coldStartupEvent;
     [SerializeField] private GameSceneSO _gameplayManagerSceneSO;
-    [SerializeField] private Text progressText;
-    public GameObject canvas;
 
     private GameSceneSO _sceneToLoad;
     private GameSceneSO _currentLoadedScene;
@@ -34,7 +37,7 @@ public class SceneLoader : MonoBehaviour
 
     private void OnEnable()
     {
-        canvas.SetActive(true);
+        onShowLoadingUI.RaiseEvent(true);
         _loadMainScene.OnLoadSceneRequested += LoadTitleScene;
 #if UNITY_EDITOR
         _coldStartupEvent.OnLoadSceneRequested += OnLoadSceneRequested;
@@ -51,6 +54,7 @@ public class SceneLoader : MonoBehaviour
 #if UNITY_EDITOR
     private void OnLoadSceneRequested(GameSceneSO roomToLoad)
     {
+        StartGameplay();
         _currentLoadedScene = roomToLoad;
 
         switch (_currentLoadedScene.sceneType)
@@ -64,8 +68,6 @@ public class SceneLoader : MonoBehaviour
                 _gameplayManagerLoadingOpHandle.WaitForCompletion();
                 _gameplayManagersSceneInstance = _gameplayManagerLoadingOpHandle.Result;
 
-
-                StartGameplay();
                 return;
             // title, select stage, UI that doesn't need gameplay managers
             case GameSceneSO.SceneType.Title:
@@ -161,16 +163,17 @@ public class SceneLoader : MonoBehaviour
     {
         while (!_loadingOperationHandle.IsDone)
         {
-            var percent = (int)(_loadingOperationHandle.GetDownloadStatus().Percent * 100);
-            progressText.text = $"{percent}%";
+            var percent = ((int)_loadingOperationHandle.GetDownloadStatus().Percent * 100);
+            onProgressChanged.RaiseEvent(percent);
+#if UNITY_EDITOR
             Debug.Log($"SceneLoader::LoadSceneAsync::Loading scene [{percent}]");
+#endif
             yield return _loadingOperationHandle.PercentComplete;
         }
     }
 
     private void OnNewSceneLoaded(AsyncOperationHandle<SceneInstance> obj)
     {
-        progressText.text = "100%";
         //Save loaded scenes (to be unloaded at next load request)
         _sceneManager.lastScene = _currentLoadedScene;
         _sceneManager.currentScene = _sceneToLoad;
@@ -180,12 +183,14 @@ public class SceneLoader : MonoBehaviour
         SceneManager.SetActiveScene(s);
         LightProbes.TetrahedralizeAsync();
 
+        onProgressChanged.RaiseEvent(1);
+
         StartGameplay();
     }
 
     private void StartGameplay()
     {
         _onSceneReadyChannel.RaiseEvent();
-        canvas.SetActive(false);
+        onShowLoadingUI.RaiseEvent(false);
     }
 }

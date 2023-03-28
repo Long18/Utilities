@@ -36,6 +36,8 @@ public class LoadingSceneUi : MonoBehaviour
         loadingPercent.text = ((int)progress * 100).ToString() + " %";
         Debug.Log($"Progress: {progress * 100}");
         loadingBar.normalizedValue = progress;
+
+        if (progress == 1) gameObject.SetActive(false);
     }
 
     #endregion
